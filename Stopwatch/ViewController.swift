@@ -9,7 +9,7 @@ import UIKit
 
 final class ViewController: UIViewController {
     
-    private var isTimerRunning = false
+    private var isTimerRunning = true
     
     private let timeLabel: UILabel = {
         let label = UILabel()
@@ -31,6 +31,18 @@ final class ViewController: UIViewController {
         return button
     }()
     
+    private lazy var resetButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Сброс", for: .normal)
+        button.backgroundColor = .gray.withAlphaComponent(0.3)
+        button.titleLabel?.font = .systemFont(ofSize: 25)
+        button.setTitleColor(.white, for: .normal)
+        button.addTarget(self, action: #selector(resetButtonTapped), for: .touchUpInside)
+        button.alpha = 0.5
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
@@ -40,12 +52,13 @@ final class ViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         startAndPauseButton.layer.cornerRadius = startAndPauseButton.frame.width / 2
+        resetButton.layer.cornerRadius = resetButton.frame.width / 2
     }
     
     @objc private func startPauseButtonTapped() {
         if isTimerRunning {
             startAndPauseButton.backgroundColor = UIColor.red.withAlphaComponent(0.3)
-            startAndPauseButton.setTitle("Пауза", for: .normal)
+            startAndPauseButton.setTitle("Стоп", for: .normal)
             startAndPauseButton.setTitleColor(.red, for: .normal)
         } else {
             startAndPauseButton.backgroundColor = .green.withAlphaComponent(0.3)
@@ -53,6 +66,11 @@ final class ViewController: UIViewController {
             startAndPauseButton.setTitleColor(.green, for: .normal)
         }
         isTimerRunning.toggle()
+        updateResetButtonAlpha()
+    }
+    
+    @objc private func resetButtonTapped() {
+        print("Тут обработаем")
     }
 }
 
@@ -62,6 +80,7 @@ private extension ViewController {
         
         view.addSubview(timeLabel)
         view.addSubview(startAndPauseButton)
+        view.addSubview(resetButton)
     }
     
     func setupConstraints() {
@@ -73,8 +92,23 @@ private extension ViewController {
             startAndPauseButton.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 100),
             startAndPauseButton.trailingAnchor.constraint(equalTo: timeLabel.trailingAnchor),
             startAndPauseButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.25),
-            startAndPauseButton.heightAnchor.constraint(equalTo: startAndPauseButton.widthAnchor)
+            startAndPauseButton.heightAnchor.constraint(equalTo: startAndPauseButton.widthAnchor),
+            
+            resetButton.heightAnchor.constraint(equalTo: startAndPauseButton.heightAnchor),
+            resetButton.widthAnchor.constraint(equalTo: startAndPauseButton.widthAnchor),
+            resetButton.leadingAnchor.constraint(equalTo: timeLabel.leadingAnchor),
+            resetButton.centerYAnchor.constraint(equalTo: startAndPauseButton.centerYAnchor)
         ])
+    }
+    
+    private func updateResetButtonAlpha() {
+        if !isTimerRunning {
+            resetButton.alpha = 0.5
+            resetButton.isEnabled = false
+        } else {
+            resetButton.alpha = 1.0
+            resetButton.isEnabled = true
+        }
     }
 }
 
